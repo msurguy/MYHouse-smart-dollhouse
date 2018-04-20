@@ -1,5 +1,5 @@
 
-![Smart Dollhouse with Gesture Recognition](./images/myhouse.myhouse.JPG)
+![Smart Dollhouse with Gesture Recognition](./images/myhouse.JPG)
 ===========
 
 This repository contains code necessary to use a Raspberry Pi as a smart home controller using gesture recognition while utilizing Machine Learning at the edge. This code can work on any Raspberry Pi, including Raspberry Pi Zero and does not require internet connection for training or inference. 
