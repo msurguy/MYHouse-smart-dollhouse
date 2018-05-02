@@ -1,14 +1,11 @@
 import os
+import signal
 import sys
 from time import sleep, gmtime, strftime
 import psmove
 from neopixel import *
-import signal
-import sys
 from gpiozero import Servo
-import os
 import subprocess
-
 
 VIDEO_PATH = "/home/pi/Desktop/video.mp4"
 
