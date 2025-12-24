@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Recognition - TensorFlow.js</title>
+  <script type="module" crossorigin src="/assets/index-dsd6L2U8.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Csd4XLrx.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 MYHouse Gesture Recognition</h1>
+            <p class="subtitle">Draw gestures with your mouse to train and test the neural network</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="collect">Collect Data</button>
+            <button class="tab" data-tab="train">Train Model</button>
+            <button class="tab" data-tab="test">Test Model</button>
+        </div>
+
+        <div class="content">
+            <!-- Data Collection Tab -->
+            <div id="collect-tab" class="tab-content active">
+                <div class="collect-layout">
+                    <div class="canvas-section">
+                        <div class="canvas-header">
+                            <label for="gesture-select">Gesture Type:</label>
+                            <select id="gesture-select">
+                                <option value="0">No Gesture</option>
+                                <option value="1">TV Poke (tap/poke)</option>
+                                <option value="2">Shutter (horizontal swipe)</option>
+                                <option value="3">Letter M</option>
+                                <option value="4">Letter Y</option>
+                                <option value="5">Fan Slow (one circle)</option>
+                                <option value="6">Fan Fast (two circles)</option>
+                            </select>
+                        </div>
+                        <canvas id="collect-canvas" width="400" height="400"></canvas>
+                        <p class="canvas-hint">Click and drag to draw a gesture. Release to save.</p>
+                    </div>
+                    <div class="data-section">
+                        <h3>Collected Samples</h3>
+                        <div id="sample-counts"></div>
+                        <div class="data-actions">
+                            <button id="clear-data-btn" class="btn btn-danger">Clear All Data</button>
+                            <button id="export-data-btn" class="btn btn-secondary">Export Data</button>
+                            <button id="import-data-btn" class="btn btn-secondary">Import Data</button>
+                            <input type="file" id="import-file" accept=".json" style="display: none;">
+                        </div>
+                        <div class="recent-samples">
+                            <h4>Recent Samples</h4>
+                            <div id="recent-list"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Tab -->
+            <div id="train-tab" class="tab-content">
+                <div class="train-layout">
+                    <div class="train-config">
+                        <h3>Training Configuration</h3>
+                        <div class="config-row">
+                            <label>Epochs:</label>
+                            <input type="number" id="epochs-input" value="100" min="1" max="500">
+                        </div>
+                        <div class="config-row">
+                            <label>Learning Rate:</label>
+                            <input type="number" id="lr-input" value="0.05" min="0.001" max="1" step="0.001">
+                        </div>
+                        <div class="config-row">
+                            <label>Batch Size:</label>
+                            <input type="number" id="batch-input" value="32" min="1" max="128">
+                        </div>
+                        <div class="config-row">
+                            <label>Validation Split:</label>
+                            <input type="number" id="val-split-input" value="0.2" min="0" max="0.5" step="0.05">
+                        </div>
+                        <div class="config-row">
+                            <label>
+                                <input type="checkbox" id="noise-augment" checked>
+                                Add Noise Augmentation
+                            </label>
+                        </div>
+                        <button id="train-btn" class="btn btn-primary btn-large">Start Training</button>
+                        <button id="stop-train-btn" class="btn btn-danger" disabled>Stop Training</button>
+                    </div>
+                    <div class="train-progress">
+                        <h3>Training Progress</h3>
+                        <div class="progress-stats">
+                            <div class="stat">
+                                <span class="stat-label">Epoch:</span>
+                                <span id="current-epoch">0</span> / <span id="total-epochs">0</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Loss:</span>
+                                <span id="current-loss">-</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Train Accuracy:</span>
+                                <span id="train-accuracy">-</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Val Accuracy:</span>
+                                <span id="val-accuracy">-</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="training-progress" class="progress-bar"></div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="loss-chart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="accuracy-chart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="model-actions">
+                        <h3>Model Management</h3>
+                        <button id="save-model-btn" class="btn btn-secondary" disabled>Save Model</button>
+                        <button id="load-model-btn" class="btn btn-secondary">Load Model</button>
+                        <input type="file" id="load-model-file" webkitdirectory style="display: none;">
+                        <div id="model-status" class="model-status">No model trained</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testing Tab -->
+            <div id="test-tab" class="tab-content">
+                <div class="test-layout">
+                    <div class="test-canvas-section">
+                        <h3>Draw a Gesture to Test</h3>
+                        <canvas id="test-canvas" width="400" height="400"></canvas>
+                        <p class="canvas-hint">Draw a gesture and see the prediction</p>
+                        <button id="clear-test-btn" class="btn btn-secondary">Clear Canvas</button>
+                    </div>
+                    <div class="prediction-section">
+                        <h3>Prediction</h3>
+                        <div id="prediction-result" class="prediction-box">
+                            <span class="prediction-label">Draw a gesture...</span>
+                        </div>
+                        <div class="confidence-bars" id="confidence-bars"></div>
+                        <div class="test-stats">
+                            <h4>Test Statistics</h4>
+                            <div id="test-stats-content">
+                                <p>Run predictions to see statistics</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
