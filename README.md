@@ -21,7 +21,9 @@ This repository contains code for gesture recognition using Machine Learning, av
 
 A complete browser-based gesture recognition system that lets you collect training data, train a neural network, and test predictions - all running locally in your browser.
 
-### Quick Start
+**[Try the Live Demo](https://msurguy.github.io/MYHouse-smart-dollhouse/)**
+
+### Quick Start (Local Development)
 
 ```bash
 cd web
